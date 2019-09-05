@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+
+	"github.com/naoty/mdserve/server"
 )
 
 // Version is the version of this app. This value is injected by Makefile.
@@ -16,4 +19,6 @@ func main() {
 			os.Exit(0)
 		}
 	}
+
+	http.ListenAndServe(":8000", &server.Server{})
 }
