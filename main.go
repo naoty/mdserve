@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -20,6 +21,7 @@ func main() {
 		}
 	}
 
-	server := server.New()
+	logger := log.New(os.Stdout, "", 0)
+	server := server.New().WithLogger(logger)
 	http.ListenAndServe(":8000", server)
 }

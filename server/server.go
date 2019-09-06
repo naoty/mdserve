@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -16,6 +17,14 @@ func New() *Server {
 
 	return &Server{
 		routes: routes,
+	}
+}
+
+// WithLogger returns a HTTP handler wrapping Server with logger.
+func (s *Server) WithLogger(l *log.Logger) http.Handler {
+	return &logger{
+		logger: l,
+		server: s,
 	}
 }
 
