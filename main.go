@@ -20,5 +20,6 @@ func main() {
 		}
 	}
 
-	http.ListenAndServe(":8000", &server.Server{})
+	server := server.New()
+	http.ListenAndServe(":8000", server)
 }
