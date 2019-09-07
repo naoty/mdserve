@@ -1,17 +1,29 @@
 package contents
 
+import (
+	"io"
+
+	"github.com/gernest/front"
+)
+
+var contents = []map[string]interface{}{}
+
+// Parse parses contents from r.
+func Parse(r io.Reader) error {
+	m := front.NewMatter()
+	m.Handle("---", front.YAMLHandler)
+	content, body, err := m.Parse(r)
+	if err != nil {
+		return err
+	}
+
+	content["body"] = body
+	contents = append(contents, content)
+
+	return nil
+}
+
 // Index returns contents.
-func Index() []map[string]string {
-	contents := []map[string]string{}
-
-	contents = append(contents, map[string]string{
-		"title": "Test1",
-		"body":  "this is test content",
-	})
-	contents = append(contents, map[string]string{
-		"title": "Test2",
-		"body":  "this is test content",
-	})
-
+func Index() []map[string]interface{} {
 	return contents
 }

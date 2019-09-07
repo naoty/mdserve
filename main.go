@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/naoty/mdserve/contents"
 	"github.com/naoty/mdserve/server"
 )
 
@@ -19,6 +20,18 @@ func main() {
 			fmt.Println(Version)
 			os.Exit(0)
 		}
+	}
+
+	file, err := os.Open("examples/post.md")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+
+	err = contents.Parse(file)
+	if err != nil {
+		file.Close()
+		log.Fatalln(err)
 	}
 
 	logger := log.New(os.Stdout, "", 0)
