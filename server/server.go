@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -30,7 +31,24 @@ func (s *Server) WithLogger(l *log.Logger) http.Handler {
 
 func contentsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		contents := []map[string]string{}
+
+		contents = append(contents, map[string]string{
+			"title": "Test1",
+			"body":  "this is test content",
+		})
+		contents = append(contents, map[string]string{
+			"title": "Test2",
+			"body":  "this is test content",
+		})
+
+		data, err := json.Marshal(contents)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(data)
 	})
 }
 
