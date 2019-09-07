@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/naoty/mdserve/contents"
 )
 
 // Server is a web server providing RESTful API for markdown contents.
@@ -31,18 +33,9 @@ func (s *Server) WithLogger(l *log.Logger) http.Handler {
 
 func contentsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		contents := []map[string]string{}
+		c := contents.Index()
 
-		contents = append(contents, map[string]string{
-			"title": "Test1",
-			"body":  "this is test content",
-		})
-		contents = append(contents, map[string]string{
-			"title": "Test2",
-			"body":  "this is test content",
-		})
-
-		data, err := json.Marshal(contents)
+		data, err := json.Marshal(c)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
