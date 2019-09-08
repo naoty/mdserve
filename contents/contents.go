@@ -1,31 +1,47 @@
 package contents
 
 import (
-	"io"
+	"os"
 
 	"github.com/gernest/front"
 	"github.com/russross/blackfriday"
 )
 
-var contents = []map[string]interface{}{}
+var contents = map[string]map[string]interface{}{}
 
-// Parse parses contents from r.
-func Parse(r io.Reader) error {
+// Parse parses contents from file at passed path.
+func Parse(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
 	m := front.NewMatter()
 	m.Handle("---", front.YAMLHandler)
-	content, body, err := m.Parse(r)
+	frontmatter, body, err := m.Parse(file)
 	if err != nil {
 		return err
 	}
 
 	html := blackfriday.Run([]byte(body))
+
+	content := map[string]interface{}{}
+	content["path"] = path
 	content["html"] = string(html)
-	contents = append(contents, content)
+	content["frontmatter"] = frontmatter
+	contents[path] = content
 
 	return nil
 }
 
 // Index returns contents.
 func Index() []map[string]interface{} {
-	return contents
+	list := []map[string]interface{}{}
+
+	for _, content := range contents {
+		list = append(list, content)
+	}
+
+	return list
 }

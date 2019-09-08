@@ -72,17 +72,5 @@ func parse(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	err = contents.Parse(file)
-	if err != nil {
-		file.Close()
-		return err
-	}
-
-	return nil
+	return contents.Parse(path)
 }
