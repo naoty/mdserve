@@ -59,7 +59,7 @@ func main() {
 	}
 
 	logger := log.New(os.Stdout, "", 0)
-	server := server.New().WithLogger(logger)
+	server := server.New(dir).WithLogger(logger)
 	http.ListenAndServe(":8000", server)
 }
 

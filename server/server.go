@@ -2,8 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/naoty/mdserve/contents"
 )
@@ -14,9 +16,12 @@ type Server struct {
 }
 
 // New returns a new Server.
-func New() *Server {
+func New(path string) *Server {
+	path = normalizedPath(path)
+
 	routes := map[string]http.Handler{}
-	routes["/contents"] = contentsHandler()
+	routes[path] = contentsHandler()
+	routes[path+"index.json"] = contentsHandler()
 
 	return &Server{
 		routes: routes,
@@ -54,4 +59,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	handler.ServeHTTP(w, r)
+}
+
+func normalizedPath(path string) string {
+	if !strings.HasPrefix(path, "/") {
+		path = fmt.Sprintf("/%s", path)
+	}
+
+	if !strings.HasSuffix(path, "/") {
+		path = fmt.Sprintf("%s/", path)
+	}
+
+	return path
 }
