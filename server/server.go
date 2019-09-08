@@ -33,15 +33,11 @@ func (s *Server) WithLogger(l *log.Logger) http.Handler {
 
 func contentsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		encoder := json.NewEncoder(w)
+		encoder.SetEscapeHTML(false)
+
 		c := contents.Index()
-
-		data, err := json.Marshal(c)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(data)
+		encoder.Encode(c)
 	})
 }
 

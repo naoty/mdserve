@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/gernest/front"
+	"github.com/russross/blackfriday"
 )
 
 var contents = []map[string]interface{}{}
@@ -17,7 +18,8 @@ func Parse(r io.Reader) error {
 		return err
 	}
 
-	content["body"] = body
+	html := blackfriday.Run([]byte(body))
+	content["html"] = string(html)
 	contents = append(contents, content)
 
 	return nil
