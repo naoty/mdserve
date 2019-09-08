@@ -38,6 +38,8 @@ func (s *Server) WithLogger(l *log.Logger) http.Handler {
 
 func contentsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 		encoder := json.NewEncoder(w)
 		encoder.SetEscapeHTML(false)
 
