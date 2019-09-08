@@ -45,3 +45,9 @@ func Index() []map[string]interface{} {
 
 	return list
 }
+
+// Get returns a content matched with passed path.
+func Get(path string) (map[string]interface{}, bool) {
+	content, ok := contents[path]
+	return content, ok
+}
