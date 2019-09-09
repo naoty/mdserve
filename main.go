@@ -16,15 +16,17 @@ import (
 var Version = ""
 
 var help = `Usage:
-  mdserve <dir>
+  mdserve <dir> [-p | --port <port>]
   mdserve -h | --help
   mdserve -v | --version
 
 Options:
-  -h --help     Show this message.
-  -v --version  Show version.`
+  -p --port <port>  Run web server at specified port [default: 8000].
+  -h --help         Show this message.
+  -v --version      Show version.`
 
 func main() {
+	port := pflag.IntP("port", "p", 8000, "")
 	helpFlag := pflag.BoolP("help", "h", false, "")
 	versionFlag := pflag.BoolP("version", "v", false, "")
 	pflag.Parse()
@@ -61,7 +63,12 @@ func main() {
 
 	logger := log.New(os.Stdout, "", 0)
 	server := server.New(dir).WithLogger(logger)
-	http.ListenAndServe(":8000", server)
+
+	addr := fmt.Sprintf(":%d", *port)
+	err = http.ListenAndServe(addr, server)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func parse(path string, info os.FileInfo, err error) error {
