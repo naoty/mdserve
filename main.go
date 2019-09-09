@@ -9,6 +9,7 @@ import (
 
 	"github.com/naoty/mdserve/contents"
 	"github.com/naoty/mdserve/server"
+	"github.com/spf13/pflag"
 )
 
 // Version is the version of this app. This value is injected by Makefile.
@@ -24,36 +25,36 @@ Options:
   -v --version  Show version.`
 
 func main() {
-	if len(os.Args) == 1 {
+	helpFlag := pflag.BoolP("help", "h", false, "")
+	versionFlag := pflag.BoolP("version", "v", false, "")
+	pflag.Parse()
+
+	if *helpFlag {
+		fmt.Println(help)
+		os.Exit(0)
+	}
+
+	if *versionFlag {
+		fmt.Println(Version)
+		os.Exit(0)
+	}
+
+	if pflag.NArg() == 0 {
 		fmt.Println(help)
 		os.Exit(1)
 	}
 
-	dir := ""
-	for _, arg := range os.Args[1:] {
-		switch arg {
-		case "-h", "--help":
-			fmt.Println(help)
-			os.Exit(0)
-		case "-v", "--version":
-			fmt.Println(Version)
-			os.Exit(0)
-		default:
-			info, err := os.Stat(arg)
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			if !info.IsDir() {
-				fmt.Println(help)
-				os.Exit(1)
-			}
-
-			dir = arg
-		}
+	dir := pflag.Arg(0)
+	info, err := os.Stat(dir)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !info.IsDir() {
+		fmt.Println(help)
+		os.Exit(1)
 	}
 
-	err := filepath.Walk(dir, parse)
+	err = filepath.Walk(dir, parse)
 	if err != nil {
 		log.Fatalln(err)
 	}
