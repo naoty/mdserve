@@ -67,6 +67,8 @@ func main() {
 	server := server.New(dir).WithLogger(logger)
 
 	addr := fmt.Sprintf("%s:%d", *host, *port)
+	logger.Printf("listening on %s\n", addr)
+
 	err = http.ListenAndServe(addr, server)
 	if err != nil {
 		log.Fatalln(err)
