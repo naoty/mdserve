@@ -13,7 +13,7 @@ type logger struct {
 func (l *logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lw := &loggingResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
 	l.server.ServeHTTP(lw, r)
-	log.Printf("status:%d method:%s path:%s\n", lw.statusCode, r.Method, r.URL.Path)
+	l.logger.Printf("status:%d method:%s path:%s\n", lw.statusCode, r.Method, r.URL.Path)
 }
 
 type loggingResponseWriter struct {
