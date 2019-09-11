@@ -24,7 +24,7 @@ func New(path string) *Server {
 	routes[path+"index.json"] = contentsHandler()
 
 	for _, content := range contents.Index() {
-		path := content["path"].(string)
+		path := content["filepath"].(string)
 		normalizedPath := normalizeContentPath(path)
 		routes[normalizedPath] = contentHandler(path)
 	}

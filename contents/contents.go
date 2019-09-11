@@ -1,8 +1,10 @@
 package contents
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gernest/front"
 	"github.com/russross/blackfriday"
@@ -43,7 +45,8 @@ func Parse(path string) error {
 	html := blackfriday.Run([]byte(body))
 
 	content := map[string]interface{}{}
-	content["path"] = path
+	content["path"] = normalizedPath(path)
+	content["filepath"] = path
 	content["html"] = string(html)
 	content["frontmatter"] = frontmatter
 	contents[path] = content
@@ -66,4 +69,12 @@ func Index() []map[string]interface{} {
 func Get(path string) (map[string]interface{}, bool) {
 	content, ok := contents[path]
 	return content, ok
+}
+
+func normalizedPath(filepath string) string {
+	if !strings.HasPrefix(filepath, "/") {
+		filepath = fmt.Sprintf("/%s", filepath)
+	}
+
+	return strings.Replace(filepath, ".md", ".json", 1)
 }
