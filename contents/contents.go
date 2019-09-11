@@ -2,12 +2,28 @@ package contents
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/gernest/front"
 	"github.com/russross/blackfriday"
 )
 
 var contents = map[string]map[string]interface{}{}
+
+// ParseAll parses contents in passed dir.
+func ParseAll(dir string) error {
+	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() || filepath.Ext(path) != ".md" {
+			return nil
+		}
+
+		return Parse(path)
+	})
+}
 
 // Parse parses contents from file at passed path.
 func Parse(path string) error {

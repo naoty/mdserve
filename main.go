@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/naoty/mdserve/contents"
 	"github.com/naoty/mdserve/server"
@@ -16,21 +15,23 @@ import (
 var Version = ""
 
 var help = `Usage:
-  mdserve <dir> [-H | --host <hostname>] [-p | --port <port>]
+  mdserve <dir> [-H | --host <hostname>] [-p | --port <port>] [-w | --watch]
   mdserve -h | --help
   mdserve -v | --version
 
 Options:
-  -H --host <hostname> Run web server at specified hostname [default: localhost].
-  -p --port <port>     Run web server at specified port [default: 8000].
-  -h --help            Show this message.
-  -v --version         Show version.`
+  -H --host <hostname>  Run web server at specified hostname [default: localhost].
+  -p --port <port>      Run web server at specified port [default: 8000].
+  -h --help             Show this message.
+  -v --version          Show version.
+  -w --watch            Watch changes in contents and parse them.`
 
 func main() {
 	host := pflag.StringP("host", "H", "localhost", "")
 	port := pflag.IntP("port", "p", 8000, "")
 	helpFlag := pflag.BoolP("help", "h", false, "")
 	versionFlag := pflag.BoolP("version", "v", false, "")
+	watchFlag := pflag.BoolP("watch", "w", false, "")
 	pflag.Parse()
 
 	if *helpFlag {
@@ -58,9 +59,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = filepath.Walk(dir, parse)
+	err = contents.ParseAll(dir)
 	if err != nil {
 		log.Fatalln(err)
+	}
+
+	if *watchFlag {
+		watcherLogger := log.New(os.Stdout, "[watcher] ", 0)
+		watcher, err := contents.NewWatcher(watcherLogger)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer watcher.Close()
+
+		err = watcher.AddAll(dir)
+		if err != nil {
+			watcher.Close()
+			log.Fatalln(err)
+		}
+
+		watcher.Start()
 	}
 
 	logger := log.New(os.Stdout, "[server] ", 0)
@@ -73,16 +91,4 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-}
-
-func parse(path string, info os.FileInfo, err error) error {
-	if err != nil {
-		return err
-	}
-
-	if info.IsDir() || filepath.Ext(path) != ".md" {
-		return nil
-	}
-
-	return contents.Parse(path)
 }
