@@ -63,7 +63,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	logger := log.New(os.Stdout, "", 0)
+	logger := log.New(os.Stdout, "[server] ", 0)
 	server := server.New(dir).WithLogger(logger)
 
 	addr := fmt.Sprintf("%s:%d", *host, *port)

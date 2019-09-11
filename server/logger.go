@@ -18,7 +18,14 @@ func (l *logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.server.ServeHTTP(lw, r)
 
 	timestamp := now.Format("2006-01-02T15:04:05.000Z07:00")
-	l.logger.Printf("time:%s\tstatus:%d\tmethod:%s\tpath:%s\n", timestamp, lw.statusCode, r.Method, r.URL.Path)
+	l.logger.Printf(
+		"%s %s %s %d %dμs\n",
+		timestamp,
+		r.Method,
+		r.URL.Path,
+		lw.statusCode,
+		time.Since(now).Microseconds(),
+	)
 }
 
 type loggingResponseWriter struct {
