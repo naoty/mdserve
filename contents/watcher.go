@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -51,7 +52,13 @@ func (w *Watcher) Start() {
 				if !ok {
 					return
 				}
-				w.logger.Println(event)
+
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					Parse(event.Name)
+
+					timestamp := time.Now().Format("2006-01-02T15:04:05.000Z07:00")
+					w.logger.Printf("%s %s\n", timestamp, event.Name)
+				}
 			case err, ok := <-w.Errors:
 				if !ok {
 					return
